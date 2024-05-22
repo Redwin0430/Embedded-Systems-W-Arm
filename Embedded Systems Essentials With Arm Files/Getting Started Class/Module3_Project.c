@@ -1,73 +1,54 @@
 #include "mbed.h"
 
-#define START p5
-#define STOP p6
-#define GAURD P7
-#define TEMP p8
-
-#define READY p9
-#define RUNNING p10
-#define GAURD_OPEN p11
-#define EXCESS_TEMP P12
-
-
 // Define the Input pins
-DigitalIn  b1(START);
-DigitalIn  b2(STOP);
-DigitalIn  b3(GAURD);
-DigitalIn  b4(TEMP);
+DigitalIn  START(p5);   // closure = logic 1;
+DigitalIn  STOP(p6);    // closure = logic 1;
+DigitalIn  GAURD(p7);   // closed condition = logic 1;
+DigitalIn  TEMP(p8);    // excess temp = logic 1;
 
 //Define the Output pins
-DigitalOut gLed(READY);
-DigitalOut bLed(RUNNING);
-DigitalOut rLed(GAURD_OPEN);
-DigitalOut yLed(EXCESS_TEMP);
-
-
-//Define Input/Output buses
-//BusIn buttonsbus (BUTTON_1,BUTTON_2,BUTTON_3,BUTTON_4);
-//BusOut ledsbus(BLUE_LED,YELLOW_LED,RED_LED);
-
-
-void ControlLED_DigitalIO ();
-void ControlLED_BusIO ();
-
+DigitalOut READY_LED(p9);           // LED1 = Motor is ready. Will "flash" when not ready
+DigitalOut RUNNING_LED(p10);        // LED2 = Motor is running
+DigitalOut GAURD_OPEN_LED(p11);     // LED3 = Fault condition, gaurd opened while motor was running. Will light for 0.5 sec 
+DigitalOut EXCESS_TEMP_LED(p12);    // LED4 = Fault condition, excess temperature while motor was running. Will light for 0.5 sec
 
 int main()
 {
     while(1) {
-        ControlLED_DigitalIO ();
-        // ControlLED_BusIO ();
-        wait(0.25);
-    }
-}
 
-void ControlLED_DigitalIO (){
-    rled = (!b4&&(!b3||b2)) || (b4&&b3&&b2&&b1);
-    yled= (b4^b3) || (b4&&b3&&b2&&b1);
-    bled = b4;
-}
+        while((GAURD == 0)||(TEMP == 1)){                       // Conditions for not ready
+            RUNNING_LED = GAURD_OPEN_LED = EXCESS_TEMP_LED = 0; // reset LEDs
+            READY_LED = !READY_LED;                             // Flashing ready
+            wait(0.25);                                         // buffer time
+        }
+        
+        while(START==0){                                        // Condition for ready state
+            READY_LED = 1;                                      // LED1 On to indicate Ready condition. Waiting for Start to be Pressed
+            wait(0.1);                                          // buffer for input start button
+        }
 
-//void ControlLED_BusIO (){
-    switch (buttonsbus){
-        case 0 ... 3:
-            ledsbus=0b0100;
-            break;
-        case 4 ... 5:
-            ledsbus=0b0010;
-            break;
-        case 6 ... 7:
-            ledsbus=0b0110;
-            break;
-        case 8 ... 11:
-            ledsbus=0b0011;
-            break;
-        case 12 ... 14:
-            ledsbus=0b0001;
-            break;
-        case 15:
-            ledsbus=0b0111;
-            break;
-        default: ;
+        while((GAURD == 1)&&(TEMP == 0)&&(STOP == 0)){          // Condition to keep motor on
+            READY_LED = 0;                                      // LED1 turned off since Motor is running
+            RUNNING_LED = 1;                                    // LED2 turned on since Motor is running
+            wait(0.25);                                         // buffer to let computer see if any of the 3 exit conditions where pressed
+        }
+
+        if (GAURD == 0){                                        // defines activity for open gaurd fault condition
+            RUNNING_LED=0;
+            GAURD_OPEN_LED = 1;
+            wait(0.5);
+            GAURD_OPEN_LED = 0;
+        }
+                
+        if(TEMP == 1){                                          // defines activity for excess temperature fault condition
+            RUNNING_LED = 0;
+            EXCESS_TEMP_LED = 1;
+            wait(0.5);
+            EXCESS_TEMP_LED = 0;
+        }
+        
+        if(STOP == 1){                                          // defines activity for stop botton pressed exit condition
+        RUNNING_LED = 0;
+        }
     }
 }
