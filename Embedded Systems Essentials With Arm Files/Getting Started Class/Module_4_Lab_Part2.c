@@ -15,10 +15,10 @@ DigitalOut led2(YELLOW_LED);
 DigitalOut led3(BLUE_LED);
 
 //Define interrupt inputs
-InterrupIn button_1(BUTTON_1);
-InterrupIn button_2(BUTTON_2);
-InterrupIn button_3(BUTTON_3);
-InterrupIn button_4(BUTTON_4);
+InterruptIn button_1(BUTTON_1);
+InterruptIn button_2(BUTTON_2);
+InterruptIn button_3(BUTTON_3);
+InterruptIn button_4(BUTTON_4);
 
 //Define counters
 volatile unsigned int count1;
@@ -68,7 +68,6 @@ void button_4_handler(){
 	led1=0;
     led2=0;
     led3=0;
-    led4-0;
 
     count1=0;
     count2=0;
