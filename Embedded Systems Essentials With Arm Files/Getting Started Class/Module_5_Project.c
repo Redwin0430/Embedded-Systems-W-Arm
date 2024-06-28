@@ -25,6 +25,8 @@ bool flashingLed;
  *----------------------------------------------------------------------------*/
 int main(){
     while(1){
+        speaker = 7 // speaker consistent volume 
+        
         // reading the value of the potentiometers
         val1 = pot1.read(); // reading the volume of liquid in the tank. Considered low if under 75% full
         val2 = pot2.read(); // reading the temp of the liquid in the tank
@@ -46,14 +48,14 @@ int main(){
                 asdf
             }
         }
-        // Create a saw-tooth sound wave
-        // Make the period and volume adjustable using the potentiometers
+
+        // Creating sound waves based on potentiometer readings
         for (i=0; i<1; i+=0.5){
             speaker.period(0.003125-(0.002*val1));  // controls the pitch (freq)
             speaker = i*0.05*val2;                  // controls the volume
         }
 
-        wait_ms(1000);  // 1 second delay
+        wait_ms(2000);  // 2 second delay
         led = 0;
     }
 }
