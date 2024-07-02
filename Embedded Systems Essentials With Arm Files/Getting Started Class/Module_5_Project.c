@@ -20,6 +20,8 @@ float val1;
 float val2;
 float i;
 bool flashingLed;
+float lowFreq;
+float highFreq;
 /*----------------------------------------------------------------------------
  MAIN function
  *----------------------------------------------------------------------------*/
@@ -39,20 +41,30 @@ int main(){
         }
         else{               // when tank is considered full - need to consider temperature cases
             if (val2 > 0.66){       // tank temp is high - two - tone
-                asfd
+                lowFreq = 20;
+                highFreq = 19357;
+
             }
             else if (val2 < 0.33){  // tank temp is low - single beeping tone
-                asdf
+                lowFreq = 20
+                highFreq = 0;
             }
             else {                  // tank temp is good - continous tone
-                asdf
+                lowFreq = 1000;
+                highFreq = 1000;
             }
         }
 
         // Creating sound waves based on potentiometer readings
+
+        // low frequency wave
         for (i=0; i<1; i+=0.5){
-            speaker.period(0.003125-(0.002*val1));  // controls the pitch (freq)
-            speaker = i*0.05*val2;                  // controls the volume
+            speaker.period(1/lowFreq);  // controls the pitch (freq)
+        }
+
+        // high frequency wave
+        for (i=0; i<1; i+=0.5){
+            speaker.period(1/highFreq);  // controls the pitch (freq)
         }
 
         wait_ms(2000);  // 2 second delay
